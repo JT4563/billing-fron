@@ -667,14 +667,23 @@ html,
 }
 
 /* Fix for generate invoice button */
-.btn.generate-invoice {
+.generate-invoice {
   background: var(--primary) !important;
   color: white !important;
+  border: none !important;
+  padding: 14px 24px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: var(--shadow) !important;
 }
 
-.btn.generate-invoice:hover {
+.generate-invoice:hover {
   background: var(--primary-hover) !important;
   color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 .main {
   flex: 1;
