@@ -91,10 +91,7 @@ export default function Invoices({ token }) {
           <div className="total-count">
             Total Invoices: <strong>{total}</strong>
           </div>
-          <button
-            onClick={() => fetchPage(1)}
-            className="btn outline"
-          >
+          <button onClick={() => fetchPage(1)} className="btn outline">
             Refresh Data
           </button>
         </div>
@@ -116,7 +113,9 @@ export default function Invoices({ token }) {
                 data.map((inv) => (
                   <tr key={inv._id}>
                     <td>
-                      <code className="invoice-number">{inv.invoiceNumber}</code>
+                      <code className="invoice-number">
+                        {inv.invoiceNumber}
+                      </code>
                     </td>
                     <td>
                       <div className="datetime">
@@ -191,10 +190,7 @@ export default function Invoices({ token }) {
             >
               Previous
             </button>
-            <button
-              onClick={() => fetchPage(page + 1)}
-              className="btn outline"
-            >
+            <button onClick={() => fetchPage(page + 1)} className="btn outline">
               Next
             </button>
           </div>

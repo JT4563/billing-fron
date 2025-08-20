@@ -203,9 +203,8 @@ export default function Billing({ token }) {
           <div className="total-amount">₹{total.toLocaleString("en-IN")}</div>
           {total > 0 && (
             <div className="total-breakdown">
-              {trucks} truck{trucks > 1 ? "s" : ""} × ₹{Number(
-                ratePerTon
-              ).toLocaleString("en-IN")}
+              {trucks} truck{trucks > 1 ? "s" : ""} × ₹
+              {Number(ratePerTon).toLocaleString("en-IN")}
               /ton
             </div>
           )}
@@ -249,9 +248,7 @@ export default function Billing({ token }) {
         {message && (
           <div className={`alert ${message.type}`}>
             <div style={{ flex: 1 }}>
-              <div
-                style={{ fontWeight: "700", marginBottom: "4px" }}
-              >
+              <div style={{ fontWeight: "700", marginBottom: "4px" }}>
                 {message.type === "success"
                   ? "Invoice Created Successfully"
                   : "Error Creating Invoice"}

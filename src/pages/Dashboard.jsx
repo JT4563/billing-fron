@@ -189,15 +189,21 @@ export default function Dashboard({ token }) {
             <div className="daily-summary">
               <div className="summary-item">
                 <span className="summary-label">Invoices:</span>
-                <span className="summary-value">{daily.totals?.invoices || 0}</span>
+                <span className="summary-value">
+                  {daily.totals?.invoices || 0}
+                </span>
               </div>
               <div className="summary-item">
                 <span className="summary-label">Trucks:</span>
-                <span className="summary-value">{daily.totals?.totalTrucks || 0}</span>
+                <span className="summary-value">
+                  {daily.totals?.totalTrucks || 0}
+                </span>
               </div>
               <div className="summary-item">
                 <span className="summary-label">Revenue:</span>
-                <span className="summary-value">₹{(daily.totals?.totalRevenue || 0).toLocaleString("en-IN")}</span>
+                <span className="summary-value">
+                  ₹{(daily.totals?.totalRevenue || 0).toLocaleString("en-IN")}
+                </span>
               </div>
             </div>
             <div className="table-container">
@@ -215,11 +221,15 @@ export default function Dashboard({ token }) {
                   {daily.invoices?.length > 0 ? (
                     daily.invoices.map((inv) => (
                       <tr key={inv._id}>
-                        <td><code>{inv.invoiceNumber}</code></td>
+                        <td>
+                          <code>{inv.invoiceNumber}</code>
+                        </td>
                         <td>{new Date(inv.createdAt).toLocaleTimeString()}</td>
                         <td>{inv.companyName}</td>
                         <td>{inv.trucks}</td>
-                        <td className="currency">₹{(inv.total || 0).toLocaleString("en-IN")}</td>
+                        <td className="currency">
+                          ₹{(inv.total || 0).toLocaleString("en-IN")}
+                        </td>
                       </tr>
                     ))
                   ) : (
@@ -234,9 +244,7 @@ export default function Dashboard({ token }) {
             </div>
           </div>
         ) : (
-          <div className="alert info">
-            No daily data available for {date}
-          </div>
+          <div className="alert info">No daily data available for {date}</div>
         )}
       </div>
     </div>
