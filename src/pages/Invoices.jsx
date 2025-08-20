@@ -86,29 +86,21 @@ export default function Invoices({ token }) {
   return (
     <div>
       <div className="card">
-        <h3>📄 Invoice Management</h3>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-          }}
-        >
-          <div className="small-muted">
-            <strong>Total Invoices:</strong> {total}
+        <h3>Invoice Management</h3>
+        <div className="invoice-header">
+          <div className="total-count">
+            Total Invoices: <strong>{total}</strong>
           </div>
           <button
             onClick={() => fetchPage(1)}
-            className="btn"
-            style={{ padding: "8px 16px", fontSize: "14px" }}
+            className="btn outline"
           >
-            🔄 Refresh
+            Refresh Data
           </button>
         </div>
 
-        <div style={{ overflowX: "auto" }}>
-          <table className="table">
+        <div className="table-container">
+          <table className="data-table">
             <thead>
               <tr>
                 <th>Invoice #</th>
@@ -123,66 +115,52 @@ export default function Invoices({ token }) {
               {data.length > 0 ? (
                 data.map((inv) => (
                   <tr key={inv._id}>
-                    <td style={{ fontWeight: "600", color: "var(--accent)" }}>
-                      {inv.invoiceNumber}
+                    <td>
+                      <code className="invoice-number">{inv.invoiceNumber}</code>
                     </td>
                     <td>
-                      <div>
-                        {new Date(inv.createdAt).toLocaleDateString("en-IN")}
+                      <div className="datetime">
+                        <div className="date">
+                          {new Date(inv.createdAt).toLocaleDateString("en-IN")}
+                        </div>
+                        <div className="time">
+                          {new Date(inv.createdAt).toLocaleTimeString("en-IN")}
+                        </div>
                       </div>
-                      <div className="small-muted">
-                        {new Date(inv.createdAt).toLocaleTimeString("en-IN")}
+                    </td>
+                    <td>
+                      <div className="customer-info">
+                        <div className="company-name">{inv.companyName}</div>
+                        {inv.companyPhone && (
+                          <div className="phone">{inv.companyPhone}</div>
+                        )}
                       </div>
                     </td>
                     <td>
-                      <div style={{ fontWeight: "500" }}>{inv.companyName}</div>
-                      {inv.companyPhone && (
-                        <div className="small-muted">{inv.companyPhone}</div>
-                      )}
-                    </td>
-                    <td>
-                      <span
-                        style={{
-                          background: "#e0f2fe",
-                          color: "#0369a1",
-                          padding: "4px 8px",
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                          fontWeight: "600",
-                        }}
-                      >
+                      <span className="truck-badge">
                         {inv.trucks} truck{inv.trucks > 1 ? "s" : ""}
                       </span>
                     </td>
-                    <td style={{ fontWeight: "600", fontSize: "16px" }}>
+                    <td className="currency">
                       ₹{(inv.total || 0).toLocaleString("en-IN")}
                     </td>
                     <td>
-                      <div style={{ display: "flex", gap: "6px" }}>
+                      <div className="action-buttons">
                         <button
-                          className="btn success"
+                          className="btn success small"
                           onClick={() =>
                             downloadPdf(inv._id, inv.invoiceNumber)
                           }
-                          style={{
-                            padding: "6px 12px",
-                            fontSize: "12px",
-                            borderRadius: "6px",
-                          }}
+                          title="Download PDF"
                         >
-                          📄 PDF
+                          Download
                         </button>
                         <button
-                          className="btn"
+                          className="btn secondary small"
                           onClick={() => printInvoice(inv._id)}
-                          style={{
-                            padding: "6px 12px",
-                            fontSize: "12px",
-                            background: "#0284c7",
-                            borderRadius: "6px",
-                          }}
+                          title="Print Invoice"
                         >
-                          🖨️ Print
+                          Print
                         </button>
                       </div>
                     </td>
@@ -190,22 +168,12 @@ export default function Invoices({ token }) {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="6"
-                    style={{
-                      textAlign: "center",
-                      padding: "40px",
-                      color: "#64748b",
-                    }}
-                  >
-                    <div style={{ fontSize: "48px", marginBottom: "16px" }}>
-                      📄
-                    </div>
-                    <div style={{ fontSize: "18px", fontWeight: "500" }}>
-                      No invoices found
-                    </div>
-                    <div style={{ fontSize: "14px", marginTop: "8px" }}>
-                      Create your first invoice from the Billing page
+                  <td colSpan="6" className="no-data">
+                    <div className="empty-state">
+                      <div className="empty-title">No invoices found</div>
+                      <div className="empty-subtitle">
+                        Create your first invoice from the Billing page
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -214,38 +182,23 @@ export default function Invoices({ token }) {
           </table>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: "20px",
-            padding: "16px 0",
-            borderTop: "1px solid var(--border)",
-          }}
-        >
-          <div style={{ display: "flex", gap: "8px" }}>
+        <div className="pagination">
+          <div className="pagination-controls">
             <button
               onClick={() => fetchPage(Math.max(1, page - 1))}
               disabled={page <= 1}
-              className="btn"
-              style={{
-                padding: "8px 16px",
-                background: page <= 1 ? "#94a3b8" : "var(--accent)",
-                fontSize: "14px",
-              }}
+              className="btn outline"
             >
-              ← Previous
+              Previous
             </button>
             <button
               onClick={() => fetchPage(page + 1)}
-              className="btn"
-              style={{ padding: "8px 16px", fontSize: "14px" }}
+              className="btn outline"
             >
-              Next →
+              Next
             </button>
           </div>
-          <div className="small-muted" style={{ fontWeight: "500" }}>
+          <div className="pagination-info">
             Page {page} • {total} total invoices
           </div>
         </div>

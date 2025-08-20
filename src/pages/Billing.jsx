@@ -113,48 +113,42 @@ export default function Billing({ token }) {
   return (
     <div>
       <div className="card">
-        <h3>📄 Create New Invoice</h3>
+        <h3>Create New Invoice</h3>
 
-        {/* Company Information Section */}
-        <div style={{ marginBottom: "24px" }}>
-          <h4
-            style={{
-              color: "#64748b",
-              fontSize: "16px",
-              marginBottom: "16px",
-              fontWeight: "600",
-            }}
-          >
-            🏢 Customer Information
-          </h4>
+        {/* Customer Information Section */}
+        <div style={{ marginBottom: "32px" }}>
+          <div className="section-title">Customer / Company Details</div>
+
           <div className="form-row">
-            <div className="label">Company Name *</div>
+            <label className="label required">Company Name</label>
             <input
               className="input"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="Enter customer/company name"
+              placeholder="Enter customer or company name"
               required
             />
           </div>
-          <div className="form-row">
-            <div className="label">Phone Number</div>
+
+          <div className="form-row split">
+            <label className="label">Phone Number</label>
             <input
-              className="input small"
+              className="input"
               value={companyPhone}
               onChange={(e) => setCompanyPhone(e.target.value)}
               placeholder="+91 98765 43210"
             />
-            <div className="label">GST Number</div>
+            <label className="label">GST Number</label>
             <input
-              className="input small"
+              className="input"
               value={companyGst}
               onChange={(e) => setCompanyGst(e.target.value)}
               placeholder="22AAAAA0000A1Z5"
             />
           </div>
+
           <div className="form-row">
-            <div className="label">Billing Address</div>
+            <label className="label">Billing Address</label>
             <input
               className="input"
               value={companyAddress}
@@ -165,40 +159,35 @@ export default function Billing({ token }) {
         </div>
 
         {/* Invoice Details Section */}
-        <div style={{ marginBottom: "24px" }}>
-          <h4
-            style={{
-              color: "#64748b",
-              fontSize: "16px",
-              marginBottom: "16px",
-              fontWeight: "600",
-            }}
-          >
-            🚛 Delivery Details
-          </h4>
-          <div className="form-row">
-            <div className="label">Rate per Ton (₹) *</div>
+        <div style={{ marginBottom: "32px" }}>
+          <div className="section-title">Invoice Details</div>
+
+          <div className="form-row split">
+            <label className="label required">Rate per Ton (₹)</label>
             <input
-              className="input small"
+              className="input"
               type="number"
               value={ratePerTon}
               onChange={(e) => setRatePerTon(e.target.value)}
               placeholder="1500"
               min="0"
               step="50"
+              required
             />
-            <div className="label">Number of Trucks *</div>
+            <label className="label required">Trucks (Qty)</label>
             <input
-              className="input small"
+              className="input"
               type="number"
               value={trucks}
               onChange={(e) => setTrucks(e.target.value)}
               placeholder="1"
               min="1"
+              required
             />
           </div>
+
           <div className="form-row">
-            <div className="label">Additional Notes</div>
+            <label className="label">Additional Notes</label>
             <input
               className="input"
               value={notes}
@@ -208,34 +197,50 @@ export default function Billing({ token }) {
           </div>
         </div>
 
-        {/* Total Section */}
-        <div className="row-right">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              marginRight: "20px",
+        {/* Total Calculation */}
+        <div className="total-display">
+          <div className="total-label">Total Invoice Amount</div>
+          <div className="total-amount">₹{total.toLocaleString("en-IN")}</div>
+          {total > 0 && (
+            <div className="total-breakdown">
+              {trucks} truck{trucks > 1 ? "s" : ""} × ₹{Number(
+                ratePerTon
+              ).toLocaleString("en-IN")}
+              /ton
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}
+        >
+          <button
+            className="btn outline"
+            type="button"
+            onClick={() => {
+              setCompanyName("");
+              setCompanyPhone("");
+              setCompanyAddress("");
+              setCompanyGst("");
+              setRatePerTon(0);
+              setTrucks(1);
+              setNotes("");
+              setMessage(null);
             }}
           >
-            <div className="small-muted">Total Amount</div>
-            <div className="footer-total">₹{total.toLocaleString("en-IN")}</div>
-            {total > 0 && (
-              <div className="small-muted">
-                {trucks} truck{trucks > 1 ? "s" : ""} × ₹{ratePerTon}/ton
-              </div>
-            )}
-          </div>
+            Clear Form
+          </button>
           <button
             className="btn"
             onClick={createInvoice}
             disabled={creating || !companyName || !ratePerTon || !trucks}
-            style={{ fontSize: "16px", padding: "14px 24px" }}
+            style={{ fontSize: "16px", padding: "16px 32px" }}
           >
             {creating ? (
-              <span className="loading">Creating...</span>
+              <span className="loading">Creating Invoice...</span>
             ) : (
-              <>📄 Generate Invoice</>
+              "Generate Invoice"
             )}
           </button>
         </div>
@@ -243,49 +248,45 @@ export default function Billing({ token }) {
         {/* Success/Error Messages */}
         {message && (
           <div className={`alert ${message.type}`}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>
-                <strong>
-                  {message.type === "success" ? "✅ Success!" : "❌ Error!"}
-                </strong>
-                <div>{message.text}</div>
+            <div style={{ flex: 1 }}>
+              <div
+                style={{ fontWeight: "700", marginBottom: "4px" }}
+              >
+                {message.type === "success"
+                  ? "Invoice Created Successfully"
+                  : "Error Creating Invoice"}
               </div>
-              {message.type === "success" && lastCreatedInvoice && (
-                <div
-                  style={{ display: "flex", gap: "8px", marginLeft: "20px" }}
-                >
-                  <button
-                    className="btn success"
-                    onClick={() =>
-                      downloadInvoicePdf(
-                        lastCreatedInvoice._id,
-                        lastCreatedInvoice.invoiceNumber
-                      )
-                    }
-                    style={{ fontSize: "14px", padding: "10px 16px" }}
-                  >
-                    📄 Download PDF
-                  </button>
-                  <button
-                    className="btn"
-                    onClick={() => printInvoice(lastCreatedInvoice._id)}
-                    style={{
-                      background: "#0284c7",
-                      fontSize: "14px",
-                      padding: "10px 16px",
-                    }}
-                  >
-                    🖨️ Print
-                  </button>
-                </div>
-              )}
+              <div>{message.text}</div>
             </div>
+            {message.type === "success" && lastCreatedInvoice && (
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  marginLeft: "20px",
+                }}
+              >
+                <button
+                  className="btn success"
+                  onClick={() =>
+                    downloadInvoicePdf(
+                      lastCreatedInvoice._id,
+                      lastCreatedInvoice.invoiceNumber
+                    )
+                  }
+                  style={{ fontSize: "14px", padding: "12px 16px" }}
+                >
+                  Download PDF
+                </button>
+                <button
+                  className="btn secondary"
+                  onClick={() => printInvoice(lastCreatedInvoice._id)}
+                  style={{ fontSize: "14px", padding: "12px 16px" }}
+                >
+                  Print Invoice
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
