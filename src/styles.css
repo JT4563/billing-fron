@@ -285,18 +285,20 @@ html,
   transition: all 0.3s ease;
   text-decoration: none;
   background: var(--primary);
-  color: white;
+  color: black !important;
   box-shadow: var(--shadow);
 }
 
 .btn:hover {
   background: var(--primary-hover);
+  color: black !important;
   transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
 .btn:disabled {
   background: var(--muted);
+  color: #6b7280 !important;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -304,31 +306,33 @@ html,
 
 .btn.secondary {
   background: var(--secondary);
-  color: white;
+  color: white !important;
 }
 
 .btn.secondary:hover {
   background: var(--secondary-hover);
+  color: white !important;
 }
 
 .btn.success {
   background: var(--success);
-  color: white;
+  color: white !important;
 }
 
 .btn.success:hover {
   background: var(--success-hover);
+  color: white !important;
 }
 
 .btn.outline {
   background: transparent;
   border: 2px solid var(--border);
-  color: var(--text);
+  color: var(--text) !important;
 }
 
 .btn.outline:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary) !important;
   background: rgba(30, 64, 175, 0.05);
 }
 
@@ -781,6 +785,7 @@ textarea:focus {
 
 .btn:disabled {
   background: #94a3b8;
+  color: #6b7280;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
