@@ -11,6 +11,7 @@ export default function Billing({ token }) {
   const [notes, setNotes] = useState('');
   const [message, setMessage] = useState(null);
   const [creating, setCreating] = useState(false);
+  const [lastCreatedInvoice, setLastCreatedInvoice] = useState(null);
 
   const total = Number(ratePerTon || 0) * Number(trucks || 0);
 
@@ -26,11 +27,65 @@ export default function Billing({ token }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Create failed');
       setMessage({ type:'success', text: `Invoice ${data.invoiceNumber} created — Total ₹${data.total}` });
+      setLastCreatedInvoice(data); // Store the created invoice data
       // reset minimal fields for next invoice
       setCompanyName(''); setCompanyPhone(''); setCompanyAddress(''); setCompanyGst(''); setRatePerTon(0); setTrucks(1); setNotes('');
     } catch (err) {
       setMessage({ type:'error', text: err.message });
     } finally { setCreating(false); }
+  };
+
+  const downloadInvoicePdf = async (invoiceId, invoiceNumber) => {
+    try {
+      const response = await fetch(`${apiBase}/invoices/${invoiceId}/pdf`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice_${invoiceNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Failed to download PDF. Please try again.');
+    }
+  };
+
+  const printInvoice = async (invoiceId) => {
+    try {
+      const response = await fetch(`${apiBase}/invoices/${invoiceId}/pdf`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const printWindow = window.open(url, '_blank');
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+    } catch (error) {
+      console.error('Error printing invoice:', error);
+      alert('Failed to open invoice for printing. Please try again.');
+    }
   };
 
   return (
@@ -67,7 +122,29 @@ export default function Billing({ token }) {
           <div className="footer-total">₹{total}</div>
           <button className="btn" onClick={createInvoice} disabled={creating}>Generate Invoice</button>
         </div>
-        {message && <div style={{marginTop:10, color: message.type==='error'?'#b91c1c':'#0b6b2f'}}>{message.text}</div>}
+        {message && (
+          <div style={{marginTop:10, color: message.type==='error'?'#b91c1c':'#0b6b2f'}}>
+            {message.text}
+            {message.type === 'success' && lastCreatedInvoice && (
+              <div style={{marginTop: '12px', display: 'flex', gap: '8px'}}>
+                <button 
+                  className="btn" 
+                  onClick={() => downloadInvoicePdf(lastCreatedInvoice._id, lastCreatedInvoice.invoiceNumber)}
+                  style={{background: '#059669', fontSize: '14px', padding: '8px 12px'}}
+                >
+                  📄 Download PDF
+                </button>
+                <button 
+                  className="btn" 
+                  onClick={() => printInvoice(lastCreatedInvoice._id)}
+                  style={{background: '#0284c7', fontSize: '14px', padding: '8px 12px'}}
+                >
+                  🖨️ Print Invoice
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

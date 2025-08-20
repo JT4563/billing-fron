@@ -24,10 +24,57 @@ export default function Invoices({ token }) {
 
   useEffect(()=>{ fetchPage(1); }, []);
 
-  const downloadPdf = (id) => {
-    const url = `${apiBase}/invoices/${id}/pdf`;
-    // Open in new tab to trigger download
-    window.open(url, '_blank');
+  const downloadPdf = async (id, invoiceNumber) => {
+    try {
+      const response = await fetch(`${apiBase}/invoices/${id}/pdf`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice_${invoiceNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Failed to download PDF. Please try again.');
+    }
+  };
+
+  const printInvoice = async (id) => {
+    try {
+      const response = await fetch(`${apiBase}/invoices/${id}/pdf`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const printWindow = window.open(url, '_blank');
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+    } catch (error) {
+      console.error('Error printing invoice:', error);
+      alert('Failed to open invoice for printing. Please try again.');
+    }
   };
 
   return (
@@ -36,7 +83,7 @@ export default function Invoices({ token }) {
         <h3>Invoices</h3>
         <p className="small-muted">Total: {total}</p>
         <table className="table">
-          <thead><tr><th>Inv #</th><th>Date</th><th>Company</th><th>Trucks</th><th>Total</th><th></th></tr></thead>
+          <thead><tr><th>Inv #</th><th>Date</th><th>Company</th><th>Trucks</th><th>Total</th><th>Actions</th></tr></thead>
           <tbody>
             {data.map(inv => (
               <tr key={inv._id}>
@@ -44,8 +91,25 @@ export default function Invoices({ token }) {
                 <td>{new Date(inv.createdAt).toLocaleString()}</td>
                 <td>{inv.companyName}</td>
                 <td>{inv.trucks}</td>
-                <td>₹{inv.total}</td>
-                <td><button className="btn" onClick={()=>downloadPdf(inv._id)}>PDF</button></td>
+                <td>₹{(inv.total || 0).toLocaleString('en-IN')}</td>
+                <td>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button 
+                      className="btn" 
+                      onClick={() => downloadPdf(inv._id, inv.invoiceNumber)}
+                      style={{ padding: '4px 8px', fontSize: '11px', background: '#059669' }}
+                    >
+                      📄 PDF
+                    </button>
+                    <button 
+                      className="btn" 
+                      onClick={() => printInvoice(inv._id)}
+                      style={{ padding: '4px 8px', fontSize: '11px', background: '#0284c7' }}
+                    >
+                      🖨️ Print
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
